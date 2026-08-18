@@ -10,12 +10,13 @@
   --taskbar-top:rgba(84,140,196,.85); --taskbar-bot:rgba(13,59,102,.92);
   --snap-tint:rgba(85,144,201,.35);
 
-  /* Glass chrome — used on titlebars, taskbar, start menu, modals */
-  --glass-highlight:rgba(255,255,255,.55);   /* top gloss band */
-  --glass-mid:rgba(79,151,214,.55);          /* derived from --acc-400 */
-  --glass-base:rgba(31,92,158,.65);          /* derived from --acc-700 */
-  --glass-border:rgba(255,255,255,.5);
-  --glass-blur:18px;
+  /* Glass chrome — authentic Aero: mostly white frosted glass, only a faint tint.
+     The accent color lives on the taskbar orb + active states, NOT the window bars. */
+  --glass-highlight:rgba(255,255,255,.9);    /* top gloss band */
+  --glass-mid:rgba(244,249,253,.62);         /* faint cool white */
+  --glass-base:rgba(220,234,247,.6);         /* faint blue-white */
+  --glass-border:rgba(255,255,255,.65);
+  --glass-blur:16px;
 
   /* Taskbar/start-menu glass (slightly darker, more opaque than window chrome) */
   --taskbar-glass-blur:22px;
@@ -36,7 +37,7 @@ html[data-theme="graphite"]{
   --sky-top:#14171a; --sky-mid:#2b3238; --sky-bot:#c9ced3; --win-border:#7b8794;
   --taskbar-top:rgba(120,130,140,.82); --taskbar-bot:rgba(20,23,26,.92);
   --snap-tint:rgba(137,147,161,.35);
-  --glass-mid:rgba(137,147,161,.55); --glass-base:rgba(69,78,88,.65);
+  --glass-mid:rgba(247,248,250,.62); --glass-base:rgba(224,228,233,.6);
 }
 html[data-theme="sunset"]{
   --acc-50:#fff2e6; --acc-200:#ffd0a3; --acc-400:#ff9d4d; --acc-600:#f2792a; --acc-700:#c95c1a; --acc-900:#5c260d;
@@ -44,7 +45,7 @@ html[data-theme="sunset"]{
   --sky-top:#3a1220; --sky-mid:#7a2f1a; --sky-bot:#ffd9a0; --win-border:#e0844a;
   --taskbar-top:rgba(255,157,77,.8); --taskbar-bot:rgba(92,38,13,.92);
   --snap-tint:rgba(255,157,77,.32);
-  --glass-mid:rgba(255,157,77,.55); --glass-base:rgba(201,92,26,.65);
+  --glass-mid:rgba(255,249,243,.62); --glass-base:rgba(250,230,216,.6);
 }
 html[data-theme="forest"]{
   --acc-50:#eaf6ec; --acc-200:#a9dab0; --acc-400:#5cb06a; --acc-600:#2f8f3d; --acc-700:#20702c; --acc-900:#0e3a16;
@@ -52,7 +53,7 @@ html[data-theme="forest"]{
   --sky-top:#0a2818; --sky-mid:#17501f; --sky-bot:#cfe7c9; --win-border:#4a9a58;
   --taskbar-top:rgba(92,176,106,.82); --taskbar-bot:rgba(14,58,22,.92);
   --snap-tint:rgba(92,176,106,.32);
-  --glass-mid:rgba(92,176,106,.55); --glass-base:rgba(32,112,44,.65);
+  --glass-mid:rgba(245,251,246,.62); --glass-base:rgba(221,239,224,.6);
 }
 html[data-theme="berry"]{
   --acc-50:#f5eafc; --acc-200:#d3a9ec; --acc-400:#a555c9; --acc-600:#832ac7; --acc-700:#631fa0; --acc-900:#2c0d49;
@@ -60,5 +61,5 @@ html[data-theme="berry"]{
   --sky-top:#1a0d33; --sky-mid:#3a1f57; --sky-bot:#d9c2f0; --win-border:#9a5cc7;
   --taskbar-top:rgba(165,85,201,.82); --taskbar-bot:rgba(44,13,73,.92);
   --snap-tint:rgba(165,85,201,.32);
-  --glass-mid:rgba(165,85,201,.55); --glass-base:rgba(99,31,160,.65);
+  --glass-mid:rgba(251,246,254,.62); --glass-base:rgba(236,223,246,.6);
 }
