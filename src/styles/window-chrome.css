@@ -2,8 +2,11 @@
    WINDOW CHROME (titlebar, buttons, panes, snap preview)
    ========================================================= */
 .window{
-  position:absolute; background:#f2f6fb; border:1px solid var(--win-border);
-  border-radius:8px 8px 5px 5px; box-shadow:0 20px 45px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.4) inset;
+  position:absolute; background:var(--chrome-50); background:rgba(247,249,252,.82);
+  backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+  border:1px solid var(--win-border);
+  border-radius:8px 8px 5px 5px;
+  box-shadow:0 20px 45px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.4) inset, inset 0 0 0 1px var(--glass-border);
   display:flex; flex-direction:column; overflow:hidden; min-width:260px; min-height:180px;
 }
 .window.hidden{ display:none; }
@@ -11,19 +14,23 @@
   height:34px; flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
   padding:0 4px 0 10px; border-bottom:1px solid var(--win-border); cursor:default;
   background:linear-gradient(180deg, var(--acc-50) 0%, var(--acc-200) 45%, var(--acc-400) 100%);
+  background:linear-gradient(180deg, var(--glass-highlight) 0%, var(--glass-mid) 45%, var(--glass-base) 100%);
+  backdrop-filter:blur(var(--glass-blur)); -webkit-backdrop-filter:blur(var(--glass-blur));
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.7);
 }
 .titlebar .tlabel{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--text-dark); text-shadow:0 1px 0 rgba(255,255,255,.8); }
 .wbtns{ display:flex; gap:3px; }
-.wbtn{ width:26px; height:22px; border-radius:2px; border:1px solid rgba(255,255,255,.5); background:linear-gradient(180deg,#f6fbff,#c9dcee); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.wbtn{ width:26px; height:22px; border-radius:2px; border:1px solid rgba(255,255,255,.5); background:linear-gradient(180deg,#f6fbff,#c9dcee); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:inset 0 1px 0 rgba(255,255,255,.8), 0 1px 2px rgba(0,0,0,.15); }
 .wbtn:hover{ filter:brightness(1.06); }
-.wbtn.close:hover{ background:linear-gradient(180deg,#f2a3a3,#d63c3c); }
+.wbtn.close:hover{ background:linear-gradient(180deg, var(--close-hover-top), var(--close-hover-bot)); }
 .wbtn svg{ width:10px; height:10px; }
 .window-body{ flex:1 1 auto; display:flex; min-height:0; }
 .pane{ flex:1; padding:16px 18px; overflow:auto; font-size:13px; color:#243b52; }
-.filters{ width:130px; background:#e7eef7; border-right:1px solid #d3dfec; padding:10px 8px; font-size:12.5px; }
+.filters{ width:130px; background:var(--chrome-100); background:rgba(238,241,245,.9); border-right:1px solid var(--chrome-300); padding:10px 8px; font-size:12.5px; }
 .filters h4{ font-size:11px; color:#5a7592; margin:2px 0 6px; font-weight:600; }
 .filters .frow{ padding:5px 7px; border-radius:3px; cursor:pointer; margin-bottom:2px; }
 .filters .frow:hover{ background:#d3e6fa; }
 .filters .frow.active{ background:var(--acc-400); color:#fff; }
 
-#snap-preview{ position:absolute; display:none; background:var(--snap-tint); border:2px solid var(--acc-200); border-radius:4px; z-index:400; pointer-events:none; }
+#snap-preview{ position:absolute; display:none; background:var(--snap-tint); border:2px solid var(--acc-200); border-radius:4px; z-index:400; pointer-events:none; backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); animation:snap-pulse .9s ease-in-out infinite alternate; }
+@keyframes snap-pulse{ from{ opacity:.6; } to{ opacity:.85; } }

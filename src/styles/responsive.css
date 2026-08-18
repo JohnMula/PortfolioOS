@@ -6,4 +6,11 @@
   .sm-right{ display:none; }
   .start-menu{ width:90vw; left:5vw; }
   .desktop-icons{ gap:10px; }
+
+  /* Drop stacked backdrop-filter layers on small screens — fall back to solid chrome */
+  .window, .titlebar, .taskbar, .start-menu, .task-item.active,
+  .modal-backdrop, .modal-card{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+  .window{ background:var(--chrome-50) !important; }
+  .start-menu{ background:var(--chrome-50) !important; }
+  .modal-card{ background:var(--chrome-50) !important; }
 }

@@ -5,10 +5,10 @@
   background:radial-gradient(ellipse at center, var(--acc-700), var(--acc-900)); color:#fff; transition:opacity .5s ease; }
 #shutdown-screen{ z-index:9998; display:none; }
 #shutdown-screen.open{ display:flex; }
-.boot-orb{ width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 35% 25%, var(--acc-200), var(--acc-900) 75%); box-shadow:0 0 30px rgba(255,255,255,.25); }
+.boot-orb{ width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 32% 22%, var(--acc-200), var(--acc-400) 40%, var(--acc-900) 78%); box-shadow:0 0 30px rgba(255,255,255,.25); }
 .boot-title{ font-size:15px; letter-spacing:.4px; opacity:.9; }
 .boot-bar{ width:200px; height:4px; border-radius:3px; background:rgba(255,255,255,.2); overflow:hidden; }
-.boot-bar span{ display:block; height:100%; width:0%; background:#fff; border-radius:3px; animation:bootfill 1.1s ease forwards; }
+.boot-bar span{ display:block; height:100%; width:0%; background:#fff; background-image:linear-gradient(180deg, rgba(255,255,255,.6), rgba(255,255,255,.1)); border-radius:3px; animation:bootfill 1.1s ease forwards; }
 @keyframes bootfill{ to{ width:100%; } }
 .hide-fade{ opacity:0; pointer-events:none; }
 .shutdown-links{ display:flex; gap:14px; margin-top:6px; }
