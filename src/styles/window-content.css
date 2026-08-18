@@ -15,7 +15,7 @@
 /* System properties (About) */
 .sysprops-head{ display:flex; align-items:center; gap:14px; margin-bottom:14px; }
 .avatar-badge{ width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:19px; color:#fff;
-  background:radial-gradient(circle at 35% 25%, var(--acc-400), var(--acc-700) 75%); box-shadow:0 2px 6px rgba(0,0,0,.3); }
+  background:var(--acc-600); box-shadow:0 2px 4px rgba(0,0,0,.25), inset 0 0 0 2px rgba(255,255,255,.2); }
 .sysprops-head h3{ margin:0; font-size:16px; color:#152b44; }
 .sysprops-head p{ margin:2px 0 0; font-size:12.5px; color:#5a7592; }
 .sysprops-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:12px; }

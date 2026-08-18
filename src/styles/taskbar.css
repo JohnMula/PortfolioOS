@@ -2,22 +2,19 @@
    TASKBAR
    ========================================================= */
 .taskbar{ position:absolute; left:0; right:0; bottom:0; height:44px; display:flex; align-items:stretch; z-index:500;
-  background:
-    radial-gradient(ellipse 200px 40px at 30px 0%, rgba(255,255,255,.15), transparent 70%),
-    linear-gradient(180deg, var(--taskbar-top), var(--taskbar-bot));
-  border-top:1px solid rgba(255,255,255,.4); box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 -2px 10px rgba(0,0,0,.3);
-  backdrop-filter:blur(var(--taskbar-glass-blur)); -webkit-backdrop-filter:blur(var(--taskbar-glass-blur)); }
-.start-button{ width:56px; margin:-3px 4px -3px 6px; border:none; cursor:pointer; border-radius:50%;
-  background:radial-gradient(circle at 32% 22%, var(--acc-200), var(--acc-400) 40%, var(--acc-900) 78%);
-  box-shadow:0 0 0 1px rgba(255,255,255,.3), 0 3px 6px rgba(0,0,0,.5), inset 0 2px 4px rgba(255,255,255,.4);
+  background:rgba(18,68,111,.92);
+  border-top:1px solid rgba(255,255,255,.42); box-shadow:inset 0 1px 0 rgba(255,255,255,.16), 0 -2px 8px rgba(0,0,0,.25); }
+.start-button{ width:42px; height:42px; margin:-1px 8px 0 6px; border:2px solid rgba(255,255,255,.65); cursor:pointer; border-radius:50%;
+  background:#2f8f3d;
+  box-shadow:0 2px 5px rgba(0,0,0,.45), inset 0 0 0 2px rgba(255,255,255,.18);
   display:flex; align-items:center; justify-content:center; }
-.start-button:hover{ filter:brightness(1.12); box-shadow:0 0 12px 2px var(--acc-400), 0 0 0 1px rgba(255,255,255,.3), 0 3px 6px rgba(0,0,0,.5), inset 0 2px 4px rgba(255,255,255,.4); }
+.start-button:hover{ background:#42a84f; box-shadow:0 0 8px rgba(145,226,255,.8), 0 2px 5px rgba(0,0,0,.45); }
 .start-button .mark{ color:#fff; font-weight:700; font-size:14px; letter-spacing:.2px; text-shadow:0 1px 2px rgba(0,0,0,.4); }
 .taskbar-sep{ width:1px; margin:7px 2px; background:rgba(255,255,255,.25); }
 .taskbar-apps{ display:flex; align-items:center; gap:2px; padding:0 4px; }
 .task-item{ position:relative; width:40px; height:34px; margin-top:5px; border-radius:3px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid transparent; }
 .task-item:hover{ background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.28); }
-.task-item.active{ background:rgba(255,255,255,.24); border-color:rgba(255,255,255,.45); backdrop-filter:blur(4px); -webkit-backdrop-filter:blur(4px); }
+.task-item.active{ background:rgba(255,255,255,.2); border-color:rgba(255,255,255,.4); }
 .task-item.active::after{ content:""; position:absolute; bottom:-1px; left:20%; right:20%; height:2px; background:#fff; border-radius:2px; }
 .taskbar-fill{ flex:1; }
 .tray{ display:flex; align-items:center; gap:10px; padding:0 10px; color:var(--text-light); }

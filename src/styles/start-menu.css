@@ -3,27 +3,26 @@
    ========================================================= */
 .start-menu{
   position:absolute; left:6px; bottom:48px; width:380px; height:460px;
-  background:rgba(247,249,252,.88);
-  backdrop-filter:blur(var(--taskbar-glass-blur)); -webkit-backdrop-filter:blur(var(--taskbar-glass-blur));
-  border:1px solid var(--win-border); border-radius:8px 8px 4px 4px;
+  background:#f7f9fc;
+  border:1px solid #6b91b5; border-radius:7px 7px 4px 4px;
   box-shadow:0 22px 48px rgba(0,0,0,.45); display:none; overflow:hidden; flex-direction:column; z-index:800;
 }
 .start-menu.open{ display:flex; }
-.sm-header{ display:flex; align-items:center; gap:10px; padding:12px 14px; background:linear-gradient(180deg, var(--acc-700), var(--acc-900)); box-shadow:inset 0 1px 0 rgba(255,255,255,.4); cursor:pointer; }
+.sm-header{ display:flex; align-items:center; gap:10px; padding:12px 14px; background:#245c8c; box-shadow:inset 0 1px 0 rgba(255,255,255,.3); cursor:pointer; }
 .sm-header .avatar-badge{ width:40px; height:40px; font-size:14px; }
 .sm-header h4{ margin:0; color:#fff; font-size:13.5px; }
 .sm-header p{ margin:1px 0 0; color:rgba(255,255,255,.75); font-size:11px; }
 .sm-search{ margin:9px 10px 0; padding:7px 10px; border-radius:3px; border:1px solid #9cbcdc; background:#fff; font-size:12.5px; color:#33475f; box-shadow:inset 0 1px 3px rgba(0,0,0,.15); }
 .sm-top{ flex:1; display:flex; min-height:0; margin-top:8px; }
 .sm-left{ flex:1; padding:2px 6px; overflow:auto; border-right:1px solid #c3d6ea; }
-.sm-right{ width:150px; background:rgba(200,216,234,.7); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); padding:10px 8px; overflow:auto; }
+.sm-right{ width:150px; background:#dbe8f3; padding:10px 8px; overflow:auto; }
 .sm-item{ display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:3px; font-size:13px; color:var(--text-dark); cursor:pointer; }
 .sm-item:hover{ background:#bcdcf7; }
 .sm-right .sm-item{ font-size:12.3px; padding:5px 6px; }
 .sm-right h5{ font-size:10.5px; color:#4d6a89; margin:6px 6px 4px; font-weight:600; }
 .sm-bottom{ display:flex; align-items:center; justify-content:flex-end; padding:8px 10px; border-top:1px solid #c3d6ea; background:#cfe0f2; position:relative; }
-.shutdown-btn{ background:linear-gradient(180deg, var(--acc-400), var(--acc-700)); color:#fff; border:1px solid var(--acc-900); border-radius:3px 0 0 3px; padding:6px 14px; font-size:12.5px; font-weight:600; cursor:pointer; text-shadow:0 1px 1px rgba(0,0,0,.3); }
-.shutdown-arrow{ background:linear-gradient(180deg, var(--acc-400), var(--acc-700)); color:#fff; border:1px solid var(--acc-900); border-left:1px solid rgba(255,255,255,.4); border-radius:0 3px 3px 0; padding:6px 8px; cursor:pointer; }
+.shutdown-btn{ background:#3574a7; color:#fff; border:1px solid #174d7a; border-radius:3px 0 0 3px; padding:6px 14px; font-size:12.5px; font-weight:600; cursor:pointer; text-shadow:0 1px 1px rgba(0,0,0,.3); }
+.shutdown-arrow{ background:#3574a7; color:#fff; border:1px solid #174d7a; border-left:1px solid rgba(255,255,255,.4); border-radius:0 3px 3px 0; padding:6px 8px; cursor:pointer; }
 .shutdown-flyout{ position:absolute; right:10px; bottom:38px; width:120px; background:#eef4fb; border:1px solid var(--win-border); border-radius:4px; box-shadow:0 10px 24px rgba(0,0,0,.35); display:none; overflow:hidden; }
 .shutdown-flyout.open{ display:block; }
 .shutdown-flyout div{ padding:7px 12px; font-size:12.3px; color:var(--text-dark); cursor:pointer; }
