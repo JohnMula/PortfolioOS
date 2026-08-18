@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-os",
+  "version": "1.0.0",
+  "description": "A personal portfolio styled as a desktop operating system — About, Projects, Resume, Skills and Contact, each in their own window.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "npx --yes serve . -l 5173",
+    "dev": "npx --yes serve . -l 5173"
+  }
+}

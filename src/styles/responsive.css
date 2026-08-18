@@ -1,0 +1,9 @@
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+@media (max-width:760px){
+  .window{ width:92vw !important; height:70vh !important; left:4vw !important; top:6vh !important; }
+  .sm-right{ display:none; }
+  .start-menu{ width:90vw; left:5vw; }
+  .desktop-icons{ gap:10px; }
+}

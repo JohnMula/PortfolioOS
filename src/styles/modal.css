@@ -1,0 +1,14 @@
+/* =========================================================
+   PROJECT MODAL
+   ========================================================= */
+.modal-backdrop{ position:absolute; inset:0; background:rgba(10,18,28,.45); display:none; align-items:center; justify-content:center; z-index:900; }
+.modal-backdrop.open{ display:flex; }
+.modal-card{ width:340px; background:#f4f8fc; border:1px solid var(--win-border); border-radius:8px; box-shadow:0 24px 50px rgba(0,0,0,.5); overflow:hidden; }
+.modal-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:linear-gradient(180deg, var(--acc-50), var(--acc-200)); }
+.modal-head h4{ margin:0; font-size:14px; color:var(--text-dark); }
+.modal-body{ padding:16px; font-size:12.8px; color:#33475f; line-height:1.55; }
+.modal-body .tagchip{ font-family:Consolas,monospace; font-size:10.5px; background:#e0e9f3; color:#5a7592; padding:2px 7px; border-radius:8px; }
+.modal-actions{ display:flex; gap:8px; margin-top:14px; }
+.modal-actions a{ flex:1; text-align:center; padding:7px 0; border-radius:4px; font-size:12.3px; font-weight:600; text-decoration:none; }
+.modal-actions .primary{ background:var(--acc-600); color:#fff; }
+.modal-actions .secondary{ background:#e2e9f1; color:#1c3350; }
