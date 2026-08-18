@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio OS</title>
+<style>
+/* =========================================================
+   THEME TOKENS — 5 accent presets, swapped via [data-theme]
+   ========================================================= */
+:root{
+  --acc-50:#eaf3fc; --acc-200:#a9cdec; --acc-400:#5590c9; --acc-600:#2a72c7; --acc-700:#1f5fa0; --acc-900:#0d3b66;
+  --hill-1:#1f6f5c; --hill-2:#2a8a68; --hill-3:#3fa374;
+  --sky-top:#0c2f57; --sky-mid:#17558f; --sky-bot:#b9dfd8;
+  --text-dark:#0e2a44; --text-light:#f4f9ff;
+  --win-border:#5c93cc;
+  --taskbar-top:rgba(84,140,196,.85); --taskbar-bot:rgba(13,59,102,.92);
+  --snap-tint:rgba(85,144,201,.35);
+}
+html[data-theme="graphite"]{
+  --acc-50:#eef1f3; --acc-200:#c4ccd3; --acc-400:#8993a1; --acc-600:#5c6773; --acc-700:#454e58; --acc-900:#20262c;
+  --hill-1:#3a3f45; --hill-2:#4d545c; --hill-3:#626b74;
+  --sky-top:#14171a; --sky-mid:#2b3238; --sky-bot:#c9ced3; --win-border:#7b8794;
+  --taskbar-top:rgba(120,130,140,.82); --taskbar-bot:rgba(20,23,26,.92);
+  --snap-tint:rgba(137,147,161,.35);
+}
+html[data-theme="sunset"]{
+  --acc-50:#fff2e6; --acc-200:#ffd0a3; --acc-400:#ff9d4d; --acc-600:#f2792a; --acc-700:#c95c1a; --acc-900:#5c260d;
+  --hill-1:#7a3a2e; --hill-2:#a1503a; --hill-3:#c96b45;
+  --sky-top:#3a1220; --sky-mid:#7a2f1a; --sky-bot:#ffd9a0; --win-border:#e0844a;
+  --taskbar-top:rgba(255,157,77,.8); --taskbar-bot:rgba(92,38,13,.92);
+  --snap-tint:rgba(255,157,77,.32);
+}
+html[data-theme="forest"]{
+  --acc-50:#eaf6ec; --acc-200:#a9dab0; --acc-400:#5cb06a; --acc-600:#2f8f3d; --acc-700:#20702c; --acc-900:#0e3a16;
+  --hill-1:#14472a; --hill-2:#1f6236; --hill-3:#2d7d45;
+  --sky-top:#0a2818; --sky-mid:#17501f; --sky-bot:#cfe7c9; --win-border:#4a9a58;
+  --taskbar-top:rgba(92,176,106,.82); --taskbar-bot:rgba(14,58,22,.92);
+  --snap-tint:rgba(92,176,106,.32);
+}
+html[data-theme="berry"]{
+  --acc-50:#f5eafc; --acc-200:#d3a9ec; --acc-400:#a555c9; --acc-600:#832ac7; --acc-700:#631fa0; --acc-900:#2c0d49;
+  --hill-1:#3a1f4d; --hill-2:#4d2a63; --hill-3:#63377d;
+  --sky-top:#1a0d33; --sky-mid:#3a1f57; --sky-bot:#d9c2f0; --win-border:#9a5cc7;
+  --taskbar-top:rgba(165,85,201,.82); --taskbar-bot:rgba(44,13,73,.92);
+  --snap-tint:rgba(165,85,201,.32);
+}
+
+/* =========================================================
+   BASE
+   ========================================================= */
+*{box-sizing:border-box;}
+html,body{
+  margin:0; height:100%;
+  font-family:"Segoe UI","Segoe UI Web",Tahoma,Verdana,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow:hidden; user-select:none;
+}
+button{font-family:inherit;}
+a{color:inherit;}
+.reduce-motion *{ animation-duration:0.001s !important; transition-duration:0.001s !important; }
+:focus-visible{ outline:2px solid #fff; outline-offset:2px; }
+
+.desktop{ position:relative; width:100%; height:100vh; min-height:560px; overflow:hidden; }
+
+/* ---------- Wallpaper ---------- */
+.wallpaper{ position:absolute; inset:0; transition:background 0.6s; }
+.wallpaper{ background:
+  radial-gradient(ellipse 700px 500px at 82% 6%, rgba(255,255,255,.32), rgba(255,255,255,0) 60%),
+  linear-gradient(180deg, var(--sky-top) 0%, var(--sky-mid) 42%, var(--sky-bot) 100%);
+}
+.bokeh{ position:absolute; border-radius:50%; background:radial-gradient(circle, rgba(255,255,255,.5), rgba(255,255,255,0) 70%); filter:blur(1px); opacity:.55; }
+.hill{ position:absolute; left:-10%; width:120%; border-radius:50% 50% 0 0 / 100% 100% 0 0; transition:background 0.6s; }
+.hill-1{ bottom:-150px; height:330px; background:var(--hill-1); opacity:.5; }
+.hill-2{ bottom:-180px; height:300px; background:var(--hill-2); opacity:.62; left:5%; width:112%; }
+.hill-3{ bottom:-205px; height:275px; background:var(--hill-3); opacity:.85; left:-2%; width:116%; }
+.grain{ position:absolute; inset:0; opacity:.035; pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+/* To use your own photo instead of the generated sky, set on .wallpaper:
+   background-image:url("your-photo-url.jpg"); background-size:cover; background-position:center; */
+
+/* ---------- App icon tile system (shared everywhere) ---------- */
+.app-icon{
+  width:40px; height:40px; border-radius:9px; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+  background-color:var(--tile);
+  background-image:linear-gradient(155deg, rgba(255,255,255,.4), rgba(255,255,255,0) 45%);
+  box-shadow:0 2px 4px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.35);
+}
+.app-icon svg{ width:22px; height:22px; stroke:#fff; fill:none; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+.app-icon.sm{ width:27px; height:27px; border-radius:6px; }
+.app-icon.sm svg{ width:16px; height:16px; }
+.app-icon.xs{ width:22px; height:22px; border-radius:5px; }
+.app-icon.xs svg{ width:13px; height:13px; }
+
+/* ---------- Desktop icons ---------- */
+.desktop-icons{ position:absolute; top:18px; left:14px; display:flex; flex-direction:column; gap:14px; z-index:5; }
+.dicon{ width:82px; display:flex; flex-direction:column; align-items:center; gap:6px; padding:7px 4px; border-radius:4px; cursor:default; }
+.dicon:hover{ background:rgba(255,255,255,.12); }
+.dicon.selected{ background:rgba(255,255,255,.22); outline:1px dashed rgba(255,255,255,.6); }
+.dicon span{ color:var(--text-light); font-size:12px; text-align:center; line-height:1.25; text-shadow:0 1px 2px rgba(0,0,0,.85); }
+
+/* ---------- Windows ---------- */
+.window{
+  position:absolute; background:#f2f6fb; border:1px solid var(--win-border);
+  border-radius:8px 8px 5px 5px; box-shadow:0 20px 45px rgba(0,0,0,.4), 0 0 0 1px rgba(255,255,255,.4) inset;
+  display:flex; flex-direction:column; overflow:hidden; min-width:260px; min-height:180px;
+}
+.window.hidden{ display:none; }
+.titlebar{
+  height:34px; flex:0 0 auto; display:flex; align-items:center; justify-content:space-between;
+  padding:0 4px 0 10px; border-bottom:1px solid var(--win-border); cursor:default;
+  background:linear-gradient(180deg, var(--acc-50) 0%, var(--acc-200) 45%, var(--acc-400) 100%);
+}
+.titlebar .tlabel{ display:flex; align-items:center; gap:8px; font-size:13px; font-weight:600; color:var(--text-dark); text-shadow:0 1px 0 rgba(255,255,255,.8); }
+.wbtns{ display:flex; gap:3px; }
+.wbtn{ width:26px; height:22px; border-radius:2px; border:1px solid rgba(255,255,255,.5); background:linear-gradient(180deg,#f6fbff,#c9dcee); display:flex; align-items:center; justify-content:center; cursor:pointer; }
+.wbtn:hover{ filter:brightness(1.06); }
+.wbtn.close:hover{ background:linear-gradient(180deg,#f2a3a3,#d63c3c); }
+.wbtn svg{ width:10px; height:10px; }
+.window-body{ flex:1 1 auto; display:flex; min-height:0; }
+.pane{ flex:1; padding:16px 18px; overflow:auto; font-size:13px; color:#243b52; }
+.filters{ width:130px; background:#e7eef7; border-right:1px solid #d3dfec; padding:10px 8px; font-size:12.5px; }
+.filters h4{ font-size:11px; color:#5a7592; margin:2px 0 6px; font-weight:600; }
+.filters .frow{ padding:5px 7px; border-radius:3px; cursor:pointer; margin-bottom:2px; }
+.filters .frow:hover{ background:#d3e6fa; }
+.filters .frow.active{ background:var(--acc-400); color:#fff; }
+
+/* Projects / Archive grids */
+.grid-items{ display:grid; grid-template-columns:repeat(auto-fill,minmax(96px,1fr)); gap:16px; }
+.gi{ display:flex; flex-direction:column; align-items:center; gap:7px; text-align:center; cursor:pointer; padding:8px 4px; border-radius:6px; }
+.gi:hover{ background:#e3edf9; }
+.gi span{ font-size:12px; line-height:1.3; }
+.gi .tagchip{ font-family:"Consolas",monospace; font-size:10px; color:#5a7592; background:#e0e9f3; padding:1px 6px; border-radius:8px; }
+
+.archive-row{ display:flex; align-items:center; gap:12px; padding:9px 6px; border-bottom:1px solid #e2e9f1; }
+.archive-row .an{ font-weight:600; color:#54607a; text-decoration:line-through; text-decoration-color:#9fb0c3; }
+.archive-row .ad{ font-size:12px; color:#7c8ea1; font-style:italic; }
+
+/* System properties (About) */
+.sysprops-head{ display:flex; align-items:center; gap:14px; margin-bottom:14px; }
+.avatar-badge{ width:56px; height:56px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:19px; color:#fff;
+  background:radial-gradient(circle at 35% 25%, var(--acc-400), var(--acc-700) 75%); box-shadow:0 2px 6px rgba(0,0,0,.3); }
+.sysprops-head h3{ margin:0; font-size:16px; color:#152b44; }
+.sysprops-head p{ margin:2px 0 0; font-size:12.5px; color:#5a7592; }
+.sysprops-table{ width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:12px; }
+.sysprops-table td{ padding:5px 4px; border-bottom:1px solid #e2e9f1; }
+.sysprops-table td:first-child{ color:#5a7592; width:44%; }
+.sysprops-table td:last-child{ color:#1c3350; font-weight:500; }
+.sysprops-bio{ font-size:12.8px; line-height:1.55; color:#33475f; }
+
+/* Notepad / skills */
+.note-body{ padding:16px; font-family:"Consolas","Segoe UI",monospace; font-size:12.8px; color:#28405a; line-height:1.7; white-space:pre-wrap; overflow:auto; }
+
+/* Contact */
+.contact-row{ display:flex; align-items:center; gap:12px; padding:9px 4px; border-bottom:1px solid #e2e9f1; }
+.contact-row a{ text-decoration:none; font-size:13px; color:#1c3350; font-weight:500; }
+.contact-row a:hover{ text-decoration:underline; }
+.copy-btn{ margin-left:auto; font-size:11.5px; padding:4px 9px; border-radius:3px; border:1px solid #b9cadd; background:#fff; cursor:pointer; color:#33475f; }
+.copy-btn:hover{ background:#eaf2fb; }
+
+/* Resume */
+.resume-toolbar{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:#e7eef7; border-bottom:1px solid #d3dfec; font-size:12.5px; }
+.btn-primary-sm{ background:var(--acc-600); color:#fff; padding:6px 12px; border-radius:3px; font-size:12px; text-decoration:none; font-weight:600; }
+.resume-page{ margin:16px; padding:20px; background:#fff; border:1px solid #dce6f0; box-shadow:0 2px 6px rgba(0,0,0,.08); }
+.resume-page h4{ margin:0 0 3px; font-size:15px; color:#152b44; }
+.resume-page .rmuted{ font-size:12px; color:#8296a9; margin-bottom:14px; }
+.skel{ height:8px; background:#e6edf5; border-radius:3px; margin-bottom:8px; }
+
+/* Settings */
+.swatches{ display:flex; gap:12px; margin:10px 0 18px; }
+.swatch{ width:38px; height:38px; border-radius:50%; border:2px solid transparent; cursor:pointer; }
+.swatch.selected{ border-color:#1c3350; box-shadow:0 0 0 2px #fff inset; }
+.setting-row{ display:flex; align-items:center; gap:8px; font-size:12.8px; margin-top:8px; }
+
+/* ---------- Start menu ---------- */
+.start-menu{
+  position:absolute; left:6px; bottom:48px; width:380px; height:460px;
+  background:linear-gradient(180deg, rgba(232,241,250,.97), rgba(202,222,242,.97));
+  border:1px solid var(--win-border); border-radius:8px 8px 4px 4px;
+  box-shadow:0 22px 48px rgba(0,0,0,.45); display:none; overflow:hidden; flex-direction:column; z-index:800;
+}
+.start-menu.open{ display:flex; }
+.sm-header{ display:flex; align-items:center; gap:10px; padding:12px 14px; background:linear-gradient(180deg, var(--acc-700), var(--acc-900)); cursor:pointer; }
+.sm-header .avatar-badge{ width:40px; height:40px; font-size:14px; }
+.sm-header h4{ margin:0; color:#fff; font-size:13.5px; }
+.sm-header p{ margin:1px 0 0; color:rgba(255,255,255,.75); font-size:11px; }
+.sm-search{ margin:9px 10px 0; padding:7px 10px; border-radius:3px; border:1px solid #9cbcdc; background:#fff; font-size:12.5px; color:#33475f; }
+.sm-top{ flex:1; display:flex; min-height:0; margin-top:8px; }
+.sm-left{ flex:1; padding:2px 6px; overflow:auto; border-right:1px solid #c3d6ea; }
+.sm-right{ width:150px; background:#dbe8f5; padding:10px 8px; overflow:auto; }
+.sm-item{ display:flex; align-items:center; gap:10px; padding:6px 8px; border-radius:3px; font-size:13px; color:var(--text-dark); cursor:pointer; }
+.sm-item:hover{ background:#bcdcf7; }
+.sm-right .sm-item{ font-size:12.3px; padding:5px 6px; }
+.sm-right h5{ font-size:10.5px; color:#4d6a89; margin:6px 6px 4px; font-weight:600; }
+.sm-bottom{ display:flex; align-items:center; justify-content:flex-end; padding:8px 10px; border-top:1px solid #c3d6ea; background:#cfe0f2; position:relative; }
+.shutdown-btn{ background:linear-gradient(180deg, var(--acc-400), var(--acc-700)); color:#fff; border:1px solid var(--acc-900); border-radius:3px 0 0 3px; padding:6px 14px; font-size:12.5px; font-weight:600; cursor:pointer; text-shadow:0 1px 1px rgba(0,0,0,.3); }
+.shutdown-arrow{ background:linear-gradient(180deg, var(--acc-400), var(--acc-700)); color:#fff; border:1px solid var(--acc-900); border-left:1px solid rgba(255,255,255,.4); border-radius:0 3px 3px 0; padding:6px 8px; cursor:pointer; }
+.shutdown-flyout{ position:absolute; right:10px; bottom:38px; width:120px; background:#eef4fb; border:1px solid var(--win-border); border-radius:4px; box-shadow:0 10px 24px rgba(0,0,0,.35); display:none; overflow:hidden; }
+.shutdown-flyout.open{ display:block; }
+.shutdown-flyout div{ padding:7px 12px; font-size:12.3px; color:var(--text-dark); cursor:pointer; }
+.shutdown-flyout div:hover{ background:#bcdcf7; }
+
+/* ---------- Taskbar ---------- */
+.taskbar{ position:absolute; left:0; right:0; bottom:0; height:44px; display:flex; align-items:stretch; z-index:500;
+  background:linear-gradient(180deg, var(--taskbar-top), var(--taskbar-bot));
+  border-top:1px solid rgba(255,255,255,.4); box-shadow:inset 0 1px 0 rgba(255,255,255,.3), 0 -2px 10px rgba(0,0,0,.3); backdrop-filter:blur(6px); }
+.start-button{ width:56px; margin:-3px 4px -3px 6px; border:none; cursor:pointer; border-radius:50%;
+  background:radial-gradient(circle at 35% 25%, var(--acc-400), var(--acc-900) 75%);
+  box-shadow:0 0 0 1px rgba(255,255,255,.3), 0 3px 6px rgba(0,0,0,.5), inset 0 2px 4px rgba(255,255,255,.4);
+  display:flex; align-items:center; justify-content:center; }
+.start-button:hover{ filter:brightness(1.12); }
+.start-button .mark{ color:#fff; font-weight:700; font-size:14px; letter-spacing:.2px; text-shadow:0 1px 2px rgba(0,0,0,.4); }
+.taskbar-sep{ width:1px; margin:7px 2px; background:rgba(255,255,255,.25); }
+.taskbar-apps{ display:flex; align-items:center; gap:2px; padding:0 4px; }
+.task-item{ position:relative; width:40px; height:34px; margin-top:5px; border-radius:3px; display:flex; align-items:center; justify-content:center; cursor:pointer; border:1px solid transparent; }
+.task-item:hover{ background:rgba(255,255,255,.14); border-color:rgba(255,255,255,.28); }
+.task-item.active{ background:rgba(255,255,255,.24); border-color:rgba(255,255,255,.45); }
+.task-item.active::after{ content:""; position:absolute; bottom:-1px; left:20%; right:20%; height:2px; background:#fff; border-radius:2px; }
+.taskbar-fill{ flex:1; }
+.tray{ display:flex; align-items:center; gap:10px; padding:0 10px; color:var(--text-light); }
+.tray svg{ width:16px; height:16px; opacity:.9; }
+.tray-clock{ font-size:12px; line-height:1.25; text-align:right; padding-left:6px; border-left:1px solid rgba(255,255,255,.25); }
+.show-desktop{ width:10px; margin-left:2px; background:rgba(255,255,255,.06); border-left:1px solid rgba(255,255,255,.25); cursor:pointer; }
+.show-desktop:hover{ background:rgba(255,255,255,.26); }
+
+/* ---------- Snap preview ---------- */
+#snap-preview{ position:absolute; display:none; background:var(--snap-tint); border:2px solid var(--acc-200); border-radius:4px; z-index:400; pointer-events:none; }
+
+/* ---------- Project modal ---------- */
+.modal-backdrop{ position:absolute; inset:0; background:rgba(10,18,28,.45); display:none; align-items:center; justify-content:center; z-index:900; }
+.modal-backdrop.open{ display:flex; }
+.modal-card{ width:340px; background:#f4f8fc; border:1px solid var(--win-border); border-radius:8px; box-shadow:0 24px 50px rgba(0,0,0,.5); overflow:hidden; }
+.modal-head{ display:flex; align-items:center; justify-content:space-between; padding:10px 14px; background:linear-gradient(180deg, var(--acc-50), var(--acc-200)); }
+.modal-head h4{ margin:0; font-size:14px; color:var(--text-dark); }
+.modal-body{ padding:16px; font-size:12.8px; color:#33475f; line-height:1.55; }
+.modal-body .tagchip{ font-family:Consolas,monospace; font-size:10.5px; background:#e0e9f3; color:#5a7592; padding:2px 7px; border-radius:8px; }
+.modal-actions{ display:flex; gap:8px; margin-top:14px; }
+.modal-actions a{ flex:1; text-align:center; padding:7px 0; border-radius:4px; font-size:12.3px; font-weight:600; text-decoration:none; }
+.modal-actions .primary{ background:var(--acc-600); color:#fff; }
+.modal-actions .secondary{ background:#e2e9f1; color:#1c3350; }
+
+/* ---------- Boot / shutdown / sleep overlays ---------- */
+#boot-screen, #shutdown-screen{ position:absolute; inset:0; z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:16px;
+  background:radial-gradient(ellipse at center, var(--acc-700), var(--acc-900)); color:#fff; transition:opacity .5s ease; }
+#shutdown-screen{ z-index:9998; display:none; }
+#shutdown-screen.open{ display:flex; }
+.boot-orb{ width:64px; height:64px; border-radius:50%; background:radial-gradient(circle at 35% 25%, var(--acc-200), var(--acc-900) 75%); box-shadow:0 0 30px rgba(255,255,255,.25); }
+.boot-title{ font-size:15px; letter-spacing:.4px; opacity:.9; }
+.boot-bar{ width:200px; height:4px; border-radius:3px; background:rgba(255,255,255,.2); overflow:hidden; }
+.boot-bar span{ display:block; height:100%; width:0%; background:#fff; border-radius:3px; animation:bootfill 1.1s ease forwards; }
+@keyframes bootfill{ to{ width:100%; } }
+.hide-fade{ opacity:0; pointer-events:none; }
+.shutdown-links{ display:flex; gap:14px; margin-top:6px; }
+.shutdown-links a{ color:#fff; font-size:12.5px; text-decoration:underline; opacity:.85; }
+.restart-btn{ margin-top:10px; background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.4); color:#fff; padding:8px 18px; border-radius:4px; cursor:pointer; font-size:12.5px; }
+.restart-btn:hover{ background:rgba(255,255,255,.25); }
+
+#sleep-overlay{ position:absolute; inset:0; background:rgba(4,8,14,.9); z-index:9990; display:none; align-items:center; justify-content:center; flex-direction:column; gap:8px; color:#fff; cursor:pointer; }
+#sleep-overlay.open{ display:flex; }
+#sleep-overlay p{ font-size:13px; opacity:.75; }
+
+@media (max-width:760px){
+  .window{ width:92vw !important; height:70vh !important; left:4vw !important; top:6vh !important; }
+  .sm-right{ display:none; }
+  .start-menu{ width:90vw; left:5vw; }
+  .desktop-icons{ gap:10px; }
+}
+</style>
+</head>
+<body>
+<div id="boot-screen">
+  <div class="boot-orb"></div>
+  <div class="boot-title" id="boot-title">Starting up…</div>
+  <div class="boot-bar"><span></span></div>
+</div>
+
+<div class="desktop" id="desktop">
+
+  <div class="wallpaper">
+    <div class="bokeh" style="width:14px;height:14px;top:18%;left:30%;"></div>
+    <div class="bokeh" style="width:8px;height:8px;top:28%;left:52%;"></div>
+    <div class="bokeh" style="width:11px;height:11px;top:14%;left:66%;"></div>
+    <div class="bokeh" style="width:6px;height:6px;top:38%;left:22%;"></div>
+    <div class="hill hill-1"></div>
+    <div class="hill hill-2"></div>
+    <div class="hill hill-3"></div>
+    <div class="grain"></div>
+  </div>
+
+  <div class="desktop-icons" id="desktop-icons">
+    <div class="dicon" data-open="win-about" tabindex="0"><div class="app-icon" style="--tile:#4f83c9"><svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.4"/><path d="M3 17c1.4-4 4-6 7-6s5.6 2 7 6"/></svg></div><span>About Me</span></div>
+    <div class="dicon" data-open="win-projects" tabindex="0"><div class="app-icon" style="--tile:#e0a83e"><svg viewBox="0 0 20 20"><path d="M2 5h6l1.5 2H18v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div><span>Projects</span></div>
+    <div class="dicon" data-open="win-resume" tabindex="0"><div class="app-icon" style="--tile:#6c63c9"><svg viewBox="0 0 20 20"><path d="M4 2h8l4 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><path d="M12 2v4h4"/><line x1="5.5" y1="11" x2="14.5" y2="11"/><line x1="5.5" y1="14" x2="14.5" y2="14"/></svg></div><span>Resume.pdf</span></div>
+    <div class="dicon" data-open="win-skills" tabindex="0"><div class="app-icon" style="--tile:#2fa39a"><svg viewBox="0 0 20 20"><path d="M3 2h11l3 3v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><line x1="5.5" y1="8" x2="14.5" y2="8"/><line x1="5.5" y1="11" x2="14.5" y2="11"/><line x1="5.5" y1="14" x2="11" y2="14"/></svg></div><span>Skills.txt</span></div>
+    <div class="dicon" data-open="win-contact" tabindex="0"><div class="app-icon" style="--tile:#d9634f"><svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2.5 5l7.5 6 7.5-6" fill="none" stroke="#4f83c9" stroke-opacity="0"/><path d="M2.5 5l7.5 6 7.5-6"/></svg></div><span>Contact</span></div>
+    <div class="dicon" data-open="win-archive" tabindex="0"><div class="app-icon" style="--tile:#7b8794"><svg viewBox="0 0 20 20"><path d="M4 7h12l-1 10H5L4 7z"/><path d="M2.5 4h15l1 3h-17z"/><line x1="8" y1="10" x2="12" y2="10"/></svg></div><span>Archive</span></div>
+  </div>
+
+  <!-- ===== ABOUT (System Properties) ===== -->
+  <div class="window hidden" id="win-about" style="top:64px;left:120px;width:460px;height:400px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#4f83c9"><svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.4"/><path d="M3 17c1.4-4 4-6 7-6s5.6 2 7 6"/></svg></div>System Properties</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-about"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-about"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-about"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body"><div class="pane" id="about-content"></div></div>
+  </div>
+
+  <!-- ===== PROJECTS ===== -->
+  <div class="window hidden" id="win-projects" style="top:104px;left:430px;width:640px;height:440px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#e0a83e"><svg viewBox="0 0 20 20"><path d="M2 5h6l1.5 2H18v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>Projects</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-projects"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-projects"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-projects"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="filters"><h4>Filter by tag</h4><div id="projects-tags"></div></div>
+      <div class="pane"><div class="grid-items" id="projects-grid"></div></div>
+    </div>
+  </div>
+
+  <!-- ===== RESUME ===== -->
+  <div class="window hidden" id="win-resume" style="top:130px;left:220px;width:420px;height:400px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#6c63c9"><svg viewBox="0 0 20 20"><path d="M4 2h8l4 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg></div>Resume.pdf</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-resume"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-resume"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-resume"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="pane" style="padding:0;">
+        <div class="resume-toolbar"><span>Resume.pdf</span><a id="resume-download" class="btn-primary-sm" href="#" target="_blank" rel="noopener">Download</a></div>
+        <div class="resume-page">
+          <h4 id="resume-name"></h4>
+          <p class="rmuted" id="resume-role"></p>
+          <div class="skel" style="width:92%"></div><div class="skel" style="width:85%"></div><div class="skel" style="width:88%"></div>
+          <div class="skel" style="width:40%;margin-top:14px"></div>
+          <div class="skel" style="width:80%"></div><div class="skel" style="width:76%"></div>
+          <p class="rmuted" style="margin-top:14px;">Placeholder preview — swap this panel for an embedded PDF viewer, or just point the Download button at your real resume file.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SKILLS (Notepad) ===== -->
+  <div class="window hidden" id="win-skills" style="top:150px;left:520px;width:380px;height:360px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#2fa39a"><svg viewBox="0 0 20 20"><path d="M3 2h11l3 3v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/><line x1="5.5" y1="8" x2="14.5" y2="8"/><line x1="5.5" y1="11" x2="14.5" y2="11"/></svg></div>skills.txt — Notepad</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-skills"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-skills"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-skills"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body"><div class="note-body" id="skills-content"></div></div>
+  </div>
+
+  <!-- ===== CONTACT ===== -->
+  <div class="window hidden" id="win-contact" style="top:170px;left:280px;width:360px;height:280px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#d9634f"><svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2.5 5l7.5 6 7.5-6"/></svg></div>Contact</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-contact"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-contact"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-contact"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body"><div class="pane" id="contact-content"></div></div>
+  </div>
+
+  <!-- ===== ARCHIVE ===== -->
+  <div class="window hidden" id="win-archive" style="top:190px;left:400px;width:400px;height:320px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#7b8794"><svg viewBox="0 0 20 20"><path d="M4 7h12l-1 10H5L4 7z"/><path d="M2.5 4h15l1 3h-17z"/></svg></div>Archive</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-archive"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-archive"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-archive"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body"><div class="pane" id="archive-content"></div></div>
+  </div>
+
+  <!-- ===== SETTINGS ===== -->
+  <div class="window hidden" id="win-settings" style="top:120px;left:320px;width:380px;height:340px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#5c6773"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.6"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3M4.5 4.5l2 2M13.5 13.5l2 2M15.5 4.5l-2 2M6.5 13.5l-2 2"/></svg></div>Personalize</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-settings"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-settings"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-settings"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body">
+      <div class="pane">
+        <h4 style="margin-top:0;">Accent color</h4>
+        <div class="swatches" id="theme-swatches"></div>
+        <div class="setting-row"><input type="checkbox" id="reduce-motion-toggle"><label for="reduce-motion-toggle">Reduce motion</label></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== HELP ===== -->
+  <div class="window hidden" id="win-help" style="top:140px;left:340px;width:340px;height:230px;">
+    <div class="titlebar" data-drag>
+      <div class="tlabel"><div class="app-icon xs" style="--tile:#4aa8d8"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/><path d="M7.5 8a2.5 2.5 0 1 1 3.6 2.2c-.8.4-1.1.8-1.1 1.6"/><circle cx="10" cy="14.3" r=".3"/></svg></div>About This Site</div>
+      <div class="wbtns">
+        <div class="wbtn" data-action="min" data-target="win-help"><svg viewBox="0 0 10 10"><rect x="1" y="7.5" width="8" height="1.4" fill="#33506f"/></svg></div>
+        <div class="wbtn" data-action="max" data-target="win-help"><svg viewBox="0 0 10 10"><rect x="1" y="1" width="8" height="8" fill="none" stroke="#33506f" stroke-width="1.2"/></svg></div>
+        <div class="wbtn close" data-action="close" data-target="win-help"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div>
+      </div>
+    </div>
+    <div class="window-body"><div class="pane">This portfolio is styled as a personal desktop OS. Use the desktop icons or the Start menu to look around — Projects, Resume, Skills and Contact all live in their own little windows, just like real programs. Try Personalize in the Start menu to change the accent color.</div></div>
+  </div>
+
+  <div id="snap-preview"></div>
+  <div class="modal-backdrop" id="project-modal"><div class="modal-card" id="project-modal-card"></div></div>
+  <div id="sleep-overlay"><div class="app-icon" style="--tile:#5c6773;width:48px;height:48px;"><svg viewBox="0 0 20 20"><path d="M15 10.5A6 6 0 1 1 9.5 5a5 5 0 0 0 5.5 5.5z" fill="#fff"/></svg></div><p id="sleep-label">Click to wake</p></div>
+
+  <!-- ===== START MENU ===== -->
+  <div class="start-menu" id="start-menu">
+    <div class="sm-header" data-open="win-about" id="sm-header">
+      <div class="avatar-badge" id="sm-avatar"></div>
+      <div><h4 id="sm-name"></h4><p id="sm-tagline"></p></div>
+    </div>
+    <input class="sm-search" id="sm-search" placeholder="Search programs and files">
+    <div class="sm-top">
+      <div class="sm-left" id="sm-left">
+        <div class="sm-item" data-open="win-about"><div class="app-icon sm" style="--tile:#4f83c9"><svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.4"/><path d="M3 17c1.4-4 4-6 7-6s5.6 2 7 6"/></svg></div>About Me</div>
+        <div class="sm-item" data-open="win-projects"><div class="app-icon sm" style="--tile:#e0a83e"><svg viewBox="0 0 20 20"><path d="M2 5h6l1.5 2H18v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div>Projects</div>
+        <div class="sm-item" data-open="win-resume"><div class="app-icon sm" style="--tile:#6c63c9"><svg viewBox="0 0 20 20"><path d="M4 2h8l4 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg></div>Resume</div>
+        <div class="sm-item" data-open="win-skills"><div class="app-icon sm" style="--tile:#2fa39a"><svg viewBox="0 0 20 20"><path d="M3 2h11l3 3v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg></div>Skills</div>
+        <div class="sm-item" data-open="win-contact"><div class="app-icon sm" style="--tile:#d9634f"><svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2.5 5l7.5 6 7.5-6"/></svg></div>Contact</div>
+        <div class="sm-item" data-open="win-archive"><div class="app-icon sm" style="--tile:#7b8794"><svg viewBox="0 0 20 20"><path d="M4 7h12l-1 10H5L4 7z"/><path d="M2.5 4h15l1 3h-17z"/></svg></div>Archive</div>
+      </div>
+      <div class="sm-right">
+        <h5>Quick links</h5>
+        <div class="sm-item"><div class="app-icon sm" style="--tile:#333"><svg viewBox="0 0 20 20"><path d="M6 4l-3 6 3 6M14 4l3 6-3 6M12 3l-4 14"/></svg></div><a id="ql-github" target="_blank" rel="noopener">GitHub</a></div>
+        <div class="sm-item"><div class="app-icon sm" style="--tile:#4a6fa5"><svg viewBox="0 0 20 20"><path d="M4 8h4v9H4zM4 5.5a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM10 8h4v1.5c1-1.3 2.2-1.7 3.5-1.2 1.4.5 2.5 1.8 2.5 4.2V17h-4v-4c0-1.1-.4-1.8-1.4-1.8s-1.6.7-1.6 1.8V17h-3z"/></svg></div><a id="ql-linkedin" target="_blank" rel="noopener">LinkedIn</a></div>
+        <div class="sm-item"><div class="app-icon sm" style="--tile:#d9634f"><svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2.5 5l7.5 6 7.5-6"/></svg></div><a id="ql-email">Email me</a></div>
+        <div class="sm-item"><div class="app-icon sm" style="--tile:#6c63c9"><svg viewBox="0 0 20 20"><path d="M10 2v11M6 9l4 4 4-4M4 16h12"/></svg></div><a id="ql-resume" target="_blank" rel="noopener">Download resume</a></div>
+        <div class="sm-item" data-open="win-settings"><div class="app-icon sm" style="--tile:#5c6773"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="2.6"/><path d="M10 2v3M10 15v3M2 10h3M15 10h3"/></svg></div>Settings</div>
+        <div class="sm-item" data-open="win-help"><div class="app-icon sm" style="--tile:#4aa8d8"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="8"/></svg></div>Help</div>
+      </div>
+    </div>
+    <div class="sm-bottom">
+      <button class="shutdown-btn" id="shutdown-btn">Shut down</button>
+      <button class="shutdown-arrow" id="shutdown-arrow">▸</button>
+      <div class="shutdown-flyout" id="shutdown-flyout">
+        <div id="fly-lock">Lock</div>
+        <div id="fly-restart">Restart</div>
+        <div id="fly-sleep">Sleep</div>
+        <div id="fly-logoff">Log off</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TASKBAR ===== -->
+  <div class="taskbar">
+    <button class="start-button" id="start-button" aria-label="Start" aria-expanded="false"><span class="mark" id="orb-initials"></span></button>
+    <div class="taskbar-sep"></div>
+    <div class="taskbar-apps" id="taskbar-apps">
+      <div class="task-item" data-open="win-about" title="About Me"><div class="app-icon xs" style="--tile:#4f83c9"><svg viewBox="0 0 20 20"><circle cx="10" cy="7" r="3.4"/><path d="M3 17c1.4-4 4-6 7-6s5.6 2 7 6"/></svg></div></div>
+      <div class="task-item" data-open="win-projects" title="Projects"><div class="app-icon xs" style="--tile:#e0a83e"><svg viewBox="0 0 20 20"><path d="M2 5h6l1.5 2H18v9a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z"/></svg></div></div>
+      <div class="task-item" data-open="win-resume" title="Resume"><div class="app-icon xs" style="--tile:#6c63c9"><svg viewBox="0 0 20 20"><path d="M4 2h8l4 4v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg></div></div>
+      <div class="task-item" data-open="win-skills" title="Skills"><div class="app-icon xs" style="--tile:#2fa39a"><svg viewBox="0 0 20 20"><path d="M3 2h11l3 3v13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg></div></div>
+      <div class="task-item" data-open="win-contact" title="Contact"><div class="app-icon xs" style="--tile:#d9634f"><svg viewBox="0 0 20 20"><rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2.5 5l7.5 6 7.5-6"/></svg></div></div>
+    </div>
+    <div class="taskbar-fill"></div>
+    <div class="tray">
+      <svg viewBox="0 0 20 20"><path d="M3 13l4-1 2-8 2 8 4 1-4 1-2 4-2-4-4-1z" fill="none" stroke="#f4f9ff" stroke-width="1.2"/></svg>
+      <svg viewBox="0 0 20 20"><path d="M2 8h4l6-5v14l-6-5H2z" fill="#f4f9ff"/><path d="M14 6c2 2 2 6 0 8" fill="none" stroke="#f4f9ff" stroke-width="1.3"/></svg>
+      <div class="tray-clock" id="tray-clock">--:-- --<br>--/--/----</div>
+    </div>
+    <div class="show-desktop" id="show-desktop" title="Show desktop"></div>
+  </div>
+</div>
+
+<script>
+(function(){
+  /* =========================================================
+     EDIT YOUR INFO HERE — this is the only section you need
+     to touch to make this your own.
+     ========================================================= */
+  const CONFIG = {
+    name: "Your Name",
+    initials: "YN",
+    role: "Full-Stack Developer",
+    tagline: "Building things for the web, one commit at a time.",
+    location: "City, Country",
+    bio: "Placeholder bio — replace with two or three sentences about who you are, what you work on, and what you care about.",
+    experience: "X years",
+    building: "Placeholder — e.g. a side project you're shipping",
+    learning: "Placeholder — e.g. Rust",
+    stack: "JavaScript, React, Node.js",
+    links: { github:"#", linkedin:"#", email:"you@example.com", resume:"#" },
+    skills: {
+      "Languages": ["JavaScript / TypeScript", "Python", "placeholder"],
+      "Frameworks & Libraries": ["React", "Next.js", "Node.js"],
+      "Tools & Platforms": ["Git", "Docker", "Figma"],
+      "Currently learning": ["placeholder"]
+    },
+    projects: [
+      { name:"Project One", tag:"Web", desc:"Placeholder description of what this project does and why it's interesting.", live:"#", code:"#" },
+      { name:"Project Two", tag:"Tool", desc:"Placeholder description of what this project does.", live:"#", code:"#" },
+      { name:"Project Three", tag:"Mobile", desc:"Placeholder description of what this project does.", live:"#", code:"#" },
+      { name:"Project Four", tag:"Open Source", desc:"Placeholder description of what this project does.", live:"#", code:"#" }
+    ],
+    archive: [
+      { name:"Old Project A", note:"Retired — placeholder note about why." },
+      { name:"Old Project B", note:"Sunset — placeholder note about why." }
+    ]
+  };
+  /* ========================================================= */
+
+  const $ = (sel, el) => (el||document).querySelector(sel);
+  const $$ = (sel, el) => Array.from((el||document).querySelectorAll(sel));
+  const desktop = $('#desktop');
+  let zTop = 20;
+
+  /* ---------- Render personal content from CONFIG ---------- */
+  function iconTile(color, path){ return '<div class="app-icon" style="--tile:'+color+'"><svg viewBox="0 0 20 20">'+path+'</svg></div>'; }
+
+  $('#orb-initials').textContent = CONFIG.initials;
+  $('#sm-name').textContent = CONFIG.name;
+  $('#sm-tagline').textContent = CONFIG.role;
+  $('#sm-avatar').textContent = CONFIG.initials;
+
+  $('#about-content').innerHTML =
+    '<div class="sysprops-head"><div class="avatar-badge">'+CONFIG.initials+'</div>'+
+    '<div><h3>'+CONFIG.name+' — Personal Edition</h3><p>'+CONFIG.tagline+'</p></div></div>'+
+    '<table class="sysprops-table">'+
+    '<tr><td>Role</td><td>'+CONFIG.role+'</td></tr>'+
+    '<tr><td>Based in</td><td>'+CONFIG.location+'</td></tr>'+
+    '<tr><td>Experience</td><td>'+CONFIG.experience+'</td></tr>'+
+    '<tr><td>Currently building</td><td>'+CONFIG.building+'</td></tr>'+
+    '<tr><td>Currently learning</td><td>'+CONFIG.learning+'</td></tr>'+
+    '<tr><td>Primary stack</td><td>'+CONFIG.stack+'</td></tr>'+
+    '<tr><td>System type</td><td>Full-stack (64-bit)</td></tr>'+
+    '</table><p class="sysprops-bio">'+CONFIG.bio+'</p>';
+
+  $('#resume-name').textContent = CONFIG.name;
+  $('#resume-role').textContent = CONFIG.role + ' · ' + CONFIG.location;
+  $('#resume-download').href = CONFIG.links.resume;
+
+  $('#contact-content').innerHTML =
+    '<div class="contact-row">'+iconTile('#d9634f','<rect x="2" y="4" width="16" height="12" rx="1.5"/><path d="M2.5 5l7.5 6 7.5-6"/>')+
+      '<a id="contact-email-link" href="mailto:'+CONFIG.links.email+'">'+CONFIG.links.email+'</a>'+
+      '<button class="copy-btn" id="copy-email-btn">Copy</button></div>'+
+    '<div class="contact-row">'+iconTile('#333','<path d="M6 4l-3 6 3 6M14 4l3 6-3 6M12 3l-4 14"/>')+
+      '<a href="'+CONFIG.links.github+'" target="_blank" rel="noopener">GitHub</a></div>'+
+    '<div class="contact-row">'+iconTile('#4a6fa5','<path d="M4 8h4v9H4zM4 5.5a2 2 0 1 1 0-4 2 2 0 0 1 0 4zM10 8h4v1.5c1-1.3 2.2-1.7 3.5-1.2 1.4.5 2.5 1.8 2.5 4.2V17h-4v-4c0-1.1-.4-1.8-1.4-1.8s-1.6.7-1.6 1.8V17h-3z"/>')+
+      '<a href="'+CONFIG.links.linkedin+'" target="_blank" rel="noopener">LinkedIn</a></div>';
+
+  $('#copy-email-btn').addEventListener('click', ()=>{
+    const btn = $('#copy-email-btn');
+    navigator.clipboard && navigator.clipboard.writeText(CONFIG.links.email).then(()=>{
+      const old = btn.textContent; btn.textContent = 'Copied!';
+      setTimeout(()=> btn.textContent = old, 1400);
+    });
+  });
+
+  $('#ql-github').href = CONFIG.links.github;
+  $('#ql-linkedin').href = CONFIG.links.linkedin;
+  $('#ql-email').href = 'mailto:' + CONFIG.links.email;
+  $('#ql-resume').href = CONFIG.links.resume;
+
+  const skillLines = Object.keys(CONFIG.skills).map(cat =>
+    cat + ':\n  ' + CONFIG.skills[cat].join(', ')
+  ).join('\n\n');
+  $('#skills-content').textContent = skillLines;
+
+  // Projects grid + tag filters
+  const grid = $('#projects-grid');
+  const tagsWrap = $('#projects-tags');
+  const uniqueTags = ['All', ...new Set(CONFIG.projects.map(p=>p.tag))];
+  tagsWrap.innerHTML = uniqueTags.map((t,i)=>
+    '<div class="frow'+(i===0?' active':'')+'" data-tag="'+t+'">'+t+'</div>'
+  ).join('');
+  function renderProjects(filter){
+    grid.innerHTML = CONFIG.projects
+      .filter(p => filter==='All' || p.tag===filter)
+      .map((p,i)=>
+        '<div class="gi" data-idx="'+CONFIG.projects.indexOf(p)+'">'+
+        iconTile('#e0a83e','<rect x="3" y="3" width="14" height="14" rx="2"/><path d="M7 10l2 2 4-4"/>')+
+        '<span>'+p.name+'</span><span class="tagchip">'+p.tag+'</span></div>'
+      ).join('');
+    $$('.gi', grid).forEach(el => el.addEventListener('dblclick', ()=> openProjectModal(CONFIG.projects[+el.dataset.idx])));
+    $$('.gi', grid).forEach(el => el.addEventListener('click', ()=>{
+      $$('.gi', grid).forEach(x=>x.classList.remove('selected'));
+      el.classList.add('selected');
+    }));
+  }
+  renderProjects('All');
+  $$('.frow', tagsWrap).forEach(f => f.addEventListener('click', ()=>{
+    $$('.frow', tagsWrap).forEach(x=>x.classList.remove('active'));
+    f.classList.add('active');
+    renderProjects(f.dataset.tag);
+  }));
+
+  function openProjectModal(p){
+    $('#project-modal-card').innerHTML =
+      '<div class="modal-head"><h4>'+p.name+'</h4><div class="wbtn close" id="modal-close"><svg viewBox="0 0 10 10"><line x1="1" y1="1" x2="9" y2="9" stroke="#33506f" stroke-width="1.4"/><line x1="9" y1="1" x2="1" y2="9" stroke="#33506f" stroke-width="1.4"/></svg></div></div>'+
+      '<div class="modal-body"><span class="tagchip">'+p.tag+'</span><p>'+p.desc+'</p>'+
+      '<div class="modal-actions"><a class="primary" href="'+p.live+'" target="_blank" rel="noopener">View live</a><a class="secondary" href="'+p.code+'" target="_blank" rel="noopener">View code</a></div></div>';
+    $('#project-modal').classList.add('open');
+    $('#modal-close').addEventListener('click', ()=> $('#project-modal').classList.remove('open'));
+  }
+  $('#project-modal').addEventListener('click', (e)=>{ if(e.target.id==='project-modal') $('#project-modal').classList.remove('open'); });
+
+  // Archive
+  $('#archive-content').innerHTML = CONFIG.archive.map(a =>
+    '<div class="archive-row"><span class="an">'+a.name+'</span><span class="ad">'+a.note+'</span></div>'
+  ).join('');
+
+  /* ---------- Window management ---------- */
+  function bringToFront(win){
+    zTop += 1; win.style.zIndex = zTop;
+    $$('.task-item[data-open]').forEach(t=>t.classList.remove('active'));
+    const item = $('.task-item[data-open="'+win.id+'"]');
+    if(item) item.classList.add('active');
+  }
+  function openWindow(id){
+    const win = document.getElementById(id);
+    if(!win) return;
+    win.classList.remove('hidden');
+    bringToFront(win);
+    startMenu.classList.remove('open');
+    startBtn.setAttribute('aria-expanded','false');
+  }
+  function hideWindow(id){
+    const win = document.getElementById(id);
+    win.classList.add('hidden');
+    const item = $('.task-item[data-open="'+id+'"]');
+    if(item) item.classList.remove('active');
+  }
+  function taskbarToggle(id){
+    const win = document.getElementById(id);
+    const isTop = parseInt(win.style.zIndex||0) === zTop && !win.classList.contains('hidden');
+    if(win.classList.contains('hidden')) openWindow(id);
+    else if(isTop) hideWindow(id);
+    else bringToFront(win);
+  }
+
+  $$('[data-open]').forEach(el=>{
+    if(el.classList.contains('task-item')){
+      el.addEventListener('click', ()=> taskbarToggle(el.dataset.open));
+    } else if(el.classList.contains('dicon')){
+      el.addEventListener('click', ()=>{ $$('.dicon').forEach(d=>d.classList.remove('selected')); el.classList.add('selected'); });
+      el.addEventListener('dblclick', ()=> openWindow(el.dataset.open));
+      el.addEventListener('keydown', (e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openWindow(el.dataset.open); } });
+    } else {
+      el.addEventListener('click', ()=> openWindow(el.dataset.open));
+    }
+  });
+
+  $$('.wbtn').forEach(btn=>{
+    btn.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      const id = btn.dataset.target, win = document.getElementById(id), action = btn.dataset.action;
+      if(action==='min') hideWindow(id);
+      else if(action==='close') hideWindow(id);
+      else if(action==='max'){
+        if(win.dataset.maxed==='1'){
+          win.style.top=win.dataset.pt; win.style.left=win.dataset.pl; win.style.width=win.dataset.pw; win.style.height=win.dataset.ph;
+          win.dataset.maxed='0';
+        } else {
+          win.dataset.pt=win.style.top; win.dataset.pl=win.style.left; win.dataset.pw=win.style.width; win.dataset.ph=win.style.height;
+          win.style.top='0px'; win.style.left='0px'; win.style.width='100%'; win.style.height='calc(100% - 44px)';
+          win.dataset.maxed='1';
+        }
+      }
+    });
+  });
+
+  const snapPreview = $('#snap-preview');
+  $$('.window').forEach(win=>{
+    win.addEventListener('mousedown', ()=> bringToFront(win));
+    const bar = win.querySelector('[data-drag]');
+    let dragging=false, offX=0, offY=0, snapSide=null;
+    bar.addEventListener('mousedown', (e)=>{
+      if(e.target.closest('.wbtn')) return;
+      dragging=true;
+      const rect = win.getBoundingClientRect();
+      offX = e.clientX - rect.left; offY = e.clientY - rect.top;
+      bringToFront(win); e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e)=>{
+      if(!dragging) return;
+      const pr = desktop.getBoundingClientRect();
+      let x = e.clientX - pr.left - offX, y = e.clientY - pr.top - offY;
+      x = Math.max(-win.offsetWidth+80, Math.min(x, pr.width-40));
+      y = Math.max(0, Math.min(y, pr.height-40));
+      win.style.left = x+'px'; win.style.top = y+'px';
+      const cx = e.clientX - pr.left;
+      if(cx < 24) snapSide='left'; else if(cx > pr.width-24) snapSide='right'; else snapSide=null;
+      if(snapSide){
+        snapPreview.style.display='block';
+        snapPreview.style.top='0px'; snapPreview.style.height='calc(100% - 44px)';
+        snapPreview.style.left = snapSide==='left' ? '0px' : '50%';
+        snapPreview.style.width = '50%';
+      } else { snapPreview.style.display='none'; }
+    });
+    document.addEventListener('mouseup', ()=>{
+      if(dragging && snapSide){
+        win.style.top='0px'; win.style.height='calc(100% - 44px)'; win.style.width='50%';
+        win.style.left = snapSide==='left' ? '0px' : '50%';
+      }
+      dragging=false; snapSide=null; snapPreview.style.display='none';
+    });
+  });
+
+  /* ---------- Start menu ---------- */
+  const startBtn = $('#start-button'), startMenu = $('#start-menu');
+  const shutdownArrow = $('#shutdown-arrow'), shutdownFlyout = $('#shutdown-flyout');
+  startBtn.addEventListener('click', (e)=>{
+    e.stopPropagation();
+    const open = startMenu.classList.toggle('open');
+    startBtn.setAttribute('aria-expanded', open?'true':'false');
+    shutdownFlyout.classList.remove('open');
+  });
+  document.addEventListener('click', (e)=>{
+    if(!startMenu.contains(e.target) && e.target!==startBtn){
+      startMenu.classList.remove('open'); startBtn.setAttribute('aria-expanded','false');
+    }
+  });
+  shutdownArrow.addEventListener('click', (e)=>{ e.stopPropagation(); shutdownFlyout.classList.toggle('open'); });
+  $('#sm-search').addEventListener('input', (e)=>{
+    const q = e.target.value.toLowerCase();
+    $$('#sm-left .sm-item').forEach(it=>{
+      it.style.display = it.textContent.toLowerCase().includes(q) ? 'flex' : 'none';
+    });
+  });
+
+  /* ---------- Show desktop ---------- */
+  let peeking=false; const wasVisible = new Set();
+  $('#show-desktop').addEventListener('click', ()=>{
+    const wins = $$('.window');
+    if(!peeking){
+      wasVisible.clear();
+      wins.forEach(w=>{ if(!w.classList.contains('hidden')){ wasVisible.add(w.id); w.classList.add('hidden'); } });
+      peeking=true;
+    } else {
+      wins.forEach(w=>{ if(wasVisible.has(w.id)) w.classList.remove('hidden'); });
+      peeking=false;
+    }
+  });
+
+  /* ---------- Theme personalization ---------- */
+  const THEMES = [
+    {id:'aero', color:'#2a72c7'}, {id:'graphite', color:'#5c6773'}, {id:'sunset', color:'#f2792a'},
+    {id:'forest', color:'#2f8f3d'}, {id:'berry', color:'#832ac7'}
+  ];
+  const swWrap = $('#theme-swatches');
+  swWrap.innerHTML = THEMES.map((t,i)=>
+    '<div class="swatch'+(i===0?' selected':'')+'" data-theme="'+t.id+'" style="background:'+t.color+'" title="'+t.id+'"></div>'
+  ).join('');
+  $$('.swatch', swWrap).forEach(sw=> sw.addEventListener('click', ()=>{
+    document.documentElement.setAttribute('data-theme', sw.dataset.theme==='aero' ? '' : sw.dataset.theme);
+    $$('.swatch', swWrap).forEach(x=>x.classList.remove('selected'));
+    sw.classList.add('selected');
+  }));
+  $('#reduce-motion-toggle').addEventListener('change', (e)=>{
+    document.body.classList.toggle('reduce-motion', e.target.checked);
+  });
+  if(window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+    $('#reduce-motion-toggle').checked = true;
+    document.body.classList.add('reduce-motion');
+  }
+
+  /* ---------- Sleep / lock ---------- */
+  function goToSleep(label){
+    $('#sleep-label').textContent = label || 'Click to wake';
+    $('#sleep-overlay').classList.add('open');
+    startMenu.classList.remove('open');
+  }
+  $('#sleep-overlay').addEventListener('click', ()=> $('#sleep-overlay').classList.remove('open'));
+  $('#fly-sleep').addEventListener('click', ()=> goToSleep('Sleeping — click to wake'));
+  $('#fly-lock').addEventListener('click', ()=> goToSleep('Locked — click to unlock'));
+  $('#fly-restart').addEventListener('click', ()=> location.reload());
+  $('#fly-logoff').addEventListener('click', ()=>{ startMenu.classList.remove('open'); shutdownFlyout.classList.remove('open'); });
+
+  /* ---------- Shut down / goodbye screen ---------- */
+  const shutdownScreen = $('#shutdown-screen');
+  function buildShutdownLinks(){
+    return '<div class="shutdown-links">'+
+      '<a href="'+CONFIG.links.github+'" target="_blank" rel="noopener">GitHub</a>'+
+      '<a href="'+CONFIG.links.linkedin+'" target="_blank" rel="noopener">LinkedIn</a>'+
+      '<a href="mailto:'+CONFIG.links.email+'">Email</a></div>';
+  }
+  $('#shutdown-btn').addEventListener('click', ()=>{
+    startMenu.classList.remove('open');
+    shutdownScreen.innerHTML =
+      '<div class="boot-orb"></div>'+
+      '<div class="boot-title">Thanks for stopping by.</div>'+
+      '<div style="font-size:12.5px;opacity:.75;">'+CONFIG.name+' · '+CONFIG.role+'</div>'+
+      buildShutdownLinks()+
+      '<button class="restart-btn" id="restart-btn">Restart</button>';
+    shutdownScreen.classList.add('open');
+    $('#restart-btn').addEventListener('click', ()=> shutdownScreen.classList.remove('open'));
+  });
+
+  /* ---------- Clock ---------- */
+  function updateClock(){
+    const now = new Date();
+    let h = now.getHours(); const ampm = h>=12?'PM':'AM'; h=h%12; if(h===0) h=12;
+    const m = String(now.getMinutes()).padStart(2,'0');
+    const dateStr = (now.getMonth()+1)+'/'+now.getDate()+'/'+now.getFullYear();
+    $('#tray-clock').innerHTML = h+':'+m+' '+ampm+'<br>'+dateStr;
+  }
+  updateClock(); setInterval(updateClock, 15000);
+
+  /* ---------- Boot sequence ---------- */
+  openWindow('win-about'); openWindow('win-projects'); openWindow('win-about');
+  const bootScreen = $('#boot-screen');
+  const skipBoot = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  $('#boot-title').textContent = 'Starting ' + CONFIG.name.split(' ')[0] + ' OS…';
+  setTimeout(()=>{
+    bootScreen.classList.add('hide-fade');
+    setTimeout(()=> bootScreen.style.display='none', skipBoot?0:520);
+  }, skipBoot ? 0 : 1250);
+})();
+</script>
+</body>
+</html>
